@@ -31,7 +31,6 @@ class _DefaultStreamExampleState extends State<DefaultStreamExample> {
     const factory = LocationMarkerDataStreamFactory();
     _positionStream =
         factory.fromGeolocatorPositionStream().asBroadcastStream();
-    _headingStream = factory.fromCompassHeadingStream().asBroadcastStream();
 
     // Get streams with default settings.
 /*
@@ -200,7 +199,7 @@ class _PulseAnimationBoxState extends State<PulseAnimationBox>
   @override
   void didUpdateWidget(PulseAnimationBox oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.stream != widget.stream){
+    if (oldWidget.stream != widget.stream) {
       _subscription?.cancel();
       _subscript();
     }

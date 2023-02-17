@@ -26,10 +26,6 @@ class CurrentLocationLayer extends StatefulWidget {
   /// [LocationMarkerDataStreamFactory.fromGeolocatorPositionStream].
   final Stream<LocationMarkerPosition?> positionStream;
 
-  /// A Stream that provide heading data for this marker. Default to
-  /// [LocationMarkerDataStreamFactory.fromCompassHeadingStream].
-  final Stream<LocationMarkerHeading?> headingStream;
-
   /// A screen point that when the map follow to the marker. The point
   /// (-1.0, -1.0) indicate the top-left corner of the map widget. The point
   /// (+1.0, +1.0) indicate the bottom-right corner of the map widget. The point
@@ -114,11 +110,9 @@ class CurrentLocationLayer extends StatefulWidget {
     this.moveAnimationCurve = Curves.fastOutSlowIn,
     this.rotateAnimationDuration = const Duration(milliseconds: 200),
     this.rotateAnimationCurve = Curves.easeInOut,
-  })  : positionStream = positionStream ??
+  }) : positionStream = positionStream ??
             const LocationMarkerDataStreamFactory()
-                .fromGeolocatorPositionStream(),
-        headingStream = headingStream ??
-            const LocationMarkerDataStreamFactory().fromCompassHeadingStream();
+                .fromGeolocatorPositionStream();
 
   @override
   State<CurrentLocationLayer> createState() => _CurrentLocationLayerState();
@@ -155,7 +149,6 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
     _isFirstLocationUpdate = true;
     _isFirstHeadingUpdate = true;
     _subscriptPositionStream();
-    _subscriptHeadingStream();
     _subscriptFollowCurrentLocationStream();
     _subscriptTurnHeadingUpStream();
   }
@@ -166,10 +159,6 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
     if (widget.positionStream != oldWidget.positionStream) {
       _positionStreamSubscription.cancel();
       _subscriptPositionStream();
-    }
-    if (widget.headingStream != oldWidget.headingStream) {
-      _headingStreamSubscription.cancel();
-      _subscriptHeadingStream();
     }
     if (widget.followCurrentLocationStream !=
         oldWidget.followCurrentLocationStream) {
@@ -328,32 +317,6 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
             break;
         }
       },
-    );
-  }
-
-  void _subscriptHeadingStream() {
-    _headingStreamSubscription = widget.headingStream.listen(
-      (LocationMarkerHeading? heading) {
-        _rotateMarker(heading!);
-
-        bool turnHeadingUp;
-        switch (widget.turnOnHeadingUpdate) {
-          case TurnOnHeadingUpdate.always:
-            turnHeadingUp = true;
-            break;
-          case TurnOnHeadingUpdate.once:
-            turnHeadingUp = _isFirstHeadingUpdate;
-            _isFirstHeadingUpdate = false;
-            break;
-          case TurnOnHeadingUpdate.never:
-            turnHeadingUp = false;
-            break;
-        }
-        if (turnHeadingUp) {
-          _rotateMap(-heading.heading % (2 * pi));
-        }
-      },
-      onError: (_) => setState(() => _currentHeading = null),
     );
   }
 

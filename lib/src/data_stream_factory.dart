@@ -1,9 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:latlong2/latlong.dart';
 
 import 'current_location_layer.dart';
 import 'data.dart';
@@ -68,7 +65,8 @@ class LocationMarkerDataStreamFactory {
               if (lastKnown != null) {
                 streamController.sink.add(lastKnown);
               }
-            } catch(_) {};
+            } catch (_) {}
+            ;
             streamController.sink.addStream(Geolocator.getPositionStream());
             break;
           case LocationPermission.unableToDetermine:
@@ -79,52 +77,5 @@ class LocationMarkerDataStreamFactory {
       }
     });
     return streamController.stream;
-  }
-
-  /// Cast to a heading stream from
-  /// [flutter_compass](https://pub.dev/packages/flutter_compass) stream.
-  Stream<LocationMarkerHeading?> fromCompassHeadingStream({
-    Stream<CompassEvent?>? stream,
-    double minAccuracy = pi * 0.1,
-    double defAccuracy = pi * 0.3,
-    double maxAccuracy = pi * 0.4,
-  }) {
-    return (stream ?? defaultHeadingStreamSource())
-        .where((CompassEvent? e) => e == null || e.heading != null)
-        .map(
-      (CompassEvent? e) {
-        return e != null
-            ? LocationMarkerHeading(
-                heading: degToRadian(e.heading!),
-                accuracy: (e.accuracy ?? defAccuracy).clamp(
-                  minAccuracy,
-                  maxAccuracy,
-                ),
-              )
-            : null;
-      },
-    );
-  }
-
-  /// Cast to a heading stream from
-  /// [flutter_compass](https://pub.dev/packages/flutter_compass) stream.
-  @Deprecated('Use fromCompassHeadingStream instead')
-  Stream<LocationMarkerHeading?> compassHeadingStream({
-    Stream<CompassEvent?>? stream,
-    double minAccuracy = pi * 0.1,
-    double defAccuracy = pi * 0.3,
-    double maxAccuracy = pi * 0.4,
-  }) =>
-      fromCompassHeadingStream(
-        stream: stream,
-        minAccuracy: minAccuracy,
-        defAccuracy: defAccuracy,
-        maxAccuracy: maxAccuracy,
-      );
-
-  /// Create a heading stream which is used as default value of
-  /// [CurrentLocationLayer.headingStream].
-  Stream<CompassEvent?> defaultHeadingStreamSource() {
-    return !kIsWeb ? FlutterCompass.events! : const Stream.empty();
   }
 }
