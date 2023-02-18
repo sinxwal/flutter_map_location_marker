@@ -129,7 +129,6 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
   late bool _isFirstHeadingUpdate;
 
   late StreamSubscription<LocationMarkerPosition?> _positionStreamSubscription;
-  late StreamSubscription<LocationMarkerHeading?> _headingStreamSubscription;
 
   /// Subscription to a stream for following single that also include a zoom
   /// level.
@@ -256,7 +255,6 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
   @override
   void dispose() {
     _positionStreamSubscription.cancel();
-    _headingStreamSubscription.cancel();
     _followCurrentLocationStreamSubscription?.cancel();
     _turnHeadingUpStreamSubscription?.cancel();
     _moveMapAnimationController?.dispose();
